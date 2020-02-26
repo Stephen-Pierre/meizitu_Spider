@@ -4,19 +4,20 @@ import lxml
 import os
 import time
 import tkinter as tk
+from tkinter.filedialog import askdirectory
 
 
 headers = {'Referer':'https://www.mzitu.com','User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3679.0 Safari/537.36'}
 
 # 构造每一页的链接
-def create_page_url_list(start_page, end_page):
+def create_page_url_list(start_page, end_page, path):
 
     url_list = []
     for i in range(int(start_page), int(end_page)+1):
         url_list.append("https://www.mzitu.com/page/{}/".format(i))
     # 调用 get_chapter_url爬取
     for url in url_list:
-        get_chapter_url(str(url))
+        get_chapter_url(str(url), path)
     
 
 # 获取图片总页数
@@ -31,7 +32,7 @@ def get_max_page():
 
 
 # 获取每一页个专题的链接
-def get_chapter_url(page_url):
+def get_chapter_url(page_url, path):
 
     chapter_url = page_url
     response = requests.get(url=chapter_url, headers=headers)
@@ -44,16 +45,19 @@ def get_chapter_url(page_url):
         title = res[i].contents[0]
         res_dict[url] = title
 
-    download_image(res_dict)
+    download_image(res_dict, path)
 
 
 # 获取每个专题的所有图片链接并下载
-def download_image(url_dict):
+def download_image(url_dict, path):
 
     for url, title in url_dict.items():
         # 根据标题创建文件夹用于保存文件
         title = str(title)
-        path = "/Users/vito/Desktop/meizispider/{}".format(title)  # 这里设置你要保存位置的绝对路径
+        
+        path = "{0}/{1}".format(path, title)
+        print(path)
+
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -75,13 +79,14 @@ def download_image(url_dict):
             with open("{0}/{1}.jpg".format(path, page), 'wb') as fp:
                 fp.write(image.content)
                 time.sleep(1)
-        
+    
+path_chosen = os.getcwd()
 
 # 定制图形界面
 def main():
     top = tk.Tk()
     top.title("妹子图专用爬虫")
-    top.geometry("240x300")
+    top.geometry("400x300")
     # 提示用户输入要爬取的页码范围
 
     # 调用get_max_page获取当前最大页码
@@ -105,9 +110,28 @@ def main():
     page_area2 = tk.Entry(top, textvariable=v2)
     v2.set(1)
     page_area2.grid(row = 6, sticky = tk.W)
+
+
+
+    # 选择路径函数
+    def selectPath():
+        global path_chosen
+        path_ = askdirectory(title = "请选择保存路径")
+        label5 = tk.Label(top,text = "保存路径：{}".format(path_), font = ("宋体", 12))
+        label5.grid(row=8,sticky = tk.W)
+        path_chosen = path_
+
+
+    print(path_chosen)
     
-    button1 = tk.Button(top, text="Start", font=("宋体", 18), command=lambda : create_page_url_list(page_area1.get(), page_area2.get()))
-    button1.grid(row = 8,sticky = tk.W)
+    # 选择路径按钮
+    button0 = tk.Button(top, text="选择保存路径", font=("宋体", 18), command=selectPath)
+    button0.grid(row = 7,sticky = tk.W)
+
+
+    # 开始按钮
+    button1 = tk.Button(top, text="Start", font=("宋体", 18), command=lambda : create_page_url_list(page_area1.get(), page_area2.get(), path_chosen))
+    button1.grid(row = 9,sticky = tk.W)
 
     top.mainloop()
 
