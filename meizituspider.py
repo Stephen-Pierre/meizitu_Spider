@@ -56,7 +56,6 @@ def download_image(url_dict, path):
         title = str(title)
         
         path = "{0}/{1}".format(path, title)
-        print(path)
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -121,8 +120,6 @@ def main():
         label5.grid(row=8,sticky = tk.W)
         path_chosen = path_
 
-
-    print(path_chosen)
     
     # 选择路径按钮
     button0 = tk.Button(top, text="选择保存路径", font=("宋体", 18), command=selectPath)
