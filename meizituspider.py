@@ -10,14 +10,14 @@ from tkinter.filedialog import askdirectory
 headers = {'Referer':'https://www.mzitu.com','User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3679.0 Safari/537.36'}
 
 # 构造每一页的链接
-def create_page_url_list(start_page, end_page, path):
+def create_page_url_list(start_page, end_page):
 
     url_list = []
     for i in range(int(start_page), int(end_page)+1):
         url_list.append("https://www.mzitu.com/page/{}/".format(i))
     # 调用 get_chapter_url爬取
     for url in url_list:
-        get_chapter_url(str(url), path)
+        get_chapter_url(str(url))
     
 
 # 获取图片总页数
@@ -32,7 +32,7 @@ def get_max_page():
 
 
 # 获取每一页个专题的链接
-def get_chapter_url(page_url, path):
+def get_chapter_url(page_url):
 
     chapter_url = page_url
     response = requests.get(url=chapter_url, headers=headers)
@@ -45,17 +45,17 @@ def get_chapter_url(page_url, path):
         title = res[i].contents[0]
         res_dict[url] = title
 
-    download_image(res_dict, path)
+    download_image(res_dict)
 
 
 # 获取每个专题的所有图片链接并下载
-def download_image(url_dict, path):
+def download_image(url_dict):
 
     for url, title in url_dict.items():
         # 根据标题创建文件夹用于保存文件
         title = str(title)
         
-        path = "{0}/{1}".format(path, title)
+        path = "{0}/{1}".format(path_chosen, title)
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -79,6 +79,7 @@ def download_image(url_dict, path):
                 fp.write(image.content)
                 time.sleep(1)
     
+
 path_chosen = os.getcwd()
 
 # 定制图形界面
@@ -127,7 +128,7 @@ def main():
 
 
     # 开始按钮
-    button1 = tk.Button(top, text="Start", font=("宋体", 18), command=lambda : create_page_url_list(page_area1.get(), page_area2.get(), path_chosen))
+    button1 = tk.Button(top, text="Start", font=("宋体", 18), command=lambda : create_page_url_list(page_area1.get(), page_area2.get()))
     button1.grid(row = 9,sticky = tk.W)
 
     top.mainloop()
