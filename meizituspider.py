@@ -27,7 +27,7 @@ def get_max_page():
     response = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(response.content, "lxml")
     # 获取图片总页数
-    max_page = soup.select("body > div.main > div.main-content > nav > div > a:nth-child(6)")[0].contents[0]
+    max_page = soup.select("body > div.main > div.main-content > div.pagination > div > a:nth-child(6)")[0].contents[0]
     return max_page
 
 
